@@ -8,30 +8,6 @@
     <%= action_cable_meta_tag %>
     <%= stylesheet_link_tag 'application', media: 'all' %>
 
-
-<link rel='stylesheet' type='text/css' href='/bower_components/fullcalendar/dist/fullcalendar.css' />
-<script type="text/javascript" src="/bower_components/jquery/dist/jquery.min.js"></script>
-<script type="text/javascript" src="/bower_components/moment/min/moment.min.js"></script>
-<script type="text/javascript" src="/bower_components/fullcalendar/dist/fullcalendar.js"></script>
-
-
-<script>
-
-  $(document).ready(function() {
-
-    // page is now ready, initialize the calendar...
-
-    $('#calendar').fullCalendar({
-        // put your options and callbacks here
-        events: [
-        {
-            title  : 'event1',
-            start  : '2017-08-08'
-        }]
-    })
-});
-</script>
-
   </head>
   <body>
     <%= yield %>
