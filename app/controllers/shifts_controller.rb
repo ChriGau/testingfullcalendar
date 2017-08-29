@@ -5,7 +5,10 @@ class ShiftsController < ApplicationController
   # GET /shifts.json
   def index
     @shifts = Shift.all
-     @shift = Shift.new
+     # @shift = Shift.find(params[:id])  => version projet
+     @shift = Shift.find_by_id(22)
+     @id = @shift.id
+     # @shift_edit = @shift = Shift.find(params[:id])
   end
 
   # GET /shifts/1
@@ -20,7 +23,19 @@ class ShiftsController < ApplicationController
 
   # GET /shifts/1/edit
   def edit
+    if @shift.save
+      respond_to do |format|
+        format.html { redirect_to shifts_path(@shift) }
+        format.js  # <-- will render `app/views/shifts/edit.js.erb`
+      end
+    else
+      respond_to do |format|
+        format.html { render 'shifts/edit' }
+        format.js  # <-- idem
+      end
+    end
   end
+
 
   # POST /shifts
   # POST /shifts.json
@@ -45,9 +60,11 @@ class ShiftsController < ApplicationController
       if @shift.update(shift_params)
         format.html { redirect_to @shift, notice: 'Shift was successfully updated.' }
         format.json { render :show, status: :ok, location: @shift }
+        format.js
       else
         format.html { render :edit }
         format.json { render json: @shift.errors, status: :unprocessable_entity }
+        format.js
       end
     end
   end

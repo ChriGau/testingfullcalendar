@@ -1,0 +1,4 @@
+$("#shift_form").html("<%= raw j render 'shifts/form', shift: @shift %>");
+$("#shift_form").show();
+$('#calendar').fullCalendar( 'refetchEvents' );
+

@@ -1,47 +1,110 @@
 <div class="container">
-  <div id = "calendar"></div>
+  <div class="row">
+    <div class="col-xs-4">
+      <div class="fc-event ui-draggable ui-draggable-handle outside role1 fc-event" draggable="true">Role1</div><br>
+      <div class="fc-event ui-draggable ui-draggable-handle outside role2 fc-event" draggable="true">Role2</div><br>
+      <div class="fc-event ui-draggable ui-draggable-handle fc-event">Role3</div><br>
+
+      <%= simple_form_for(@shift) do |f| %>
+      <%= f.error_notification %>
+        <div class="form-inputs">
+          <%= f.input :start %>
+          <%= f.input :end %>
+          <%= f.input :title %>
+          <%= f.input :description %>
+        </div>
+        <div class="form-actions">
+          <%= f.button :submit %>
+        </div>
+      <% end %>
+    </div>
+    <div class="col-xs-8">
+      <div id = "calendar">
+      </div>
+    </div>
+  </div>
+</div>
+<div class="container">
+  <div class="row">
+      <div id="shift_form" style="background-color: orange; height: 400px;"></div>
+  </div>
 </div>
 
 
 <%= content_for(:after_js) do %>
   <script>
     $('#calendar').fullCalendar({
+      //calendar attributes
       header: {
         left: 'prev,next today',
         center: 'title',
-        right: 'month,agendaWeek,agendaDay'
+        right: 'agendaWeek,agendaDay'
       },
       editable: true, // events on the calendar can be modified
       droppable: true, // allows things to be dropped onto the calendar
-      events: '/shifts.json',
+      minTime: "07:00:00", // starting time, even when scrolled all the way up
+      maxTime: "22:00:00",
+      // events: "/shifts.json",
+      events: <%= raw Shift.all.to_json %>,
 
-        // 1. edit slot
-        // resizing: (on drop) get date
-        // on click: get number of people
-        // => update instances (date)
+      // 2. cas où on drag-drop un event déjà existant dans le calendar
+      eventDrop: function(event, delta, revertFunc, jsEvent, ui, view ) {
+        alert(event.title + " was dropped on " + event.start.format() + "and end date =" + event.end.format());
+        console.log(event);
+        // modified start => event.start.format()
+        // modified end  => event.end.format()
+        // lors du display du form, il doit préremplir avec ces 2 dates VS les anciennes
+        // modifier les attributs de @shift?
 
-        // 2. create slot (dropped from the outside)
-        // get date
-        // ask + get number of people for this slot (n)
-        // instance already exists? (not dropped from outside) => update instance of slot
-        // else create n instance of slot
-        // change class of object
-        // store ids of the slots in it?
-      drop: function(date, jsEvent, ui, resourceId) {
-        // is the "remove after drop" checkbox checked?
-        alert("Dropped on " + date.format());
-        console.log(date);
-        if ($('#drop-remove').is(':checked')) {
-          // if so, remove the element from the "Draggable Events" list
-          $(this).remove();
-        }
-      }
+        $.ajax({
+          type: "GET",
+          url: "/shifts/22/edit.js", // shift_edit_path(@shift, format: : js)
+          // data = ce que le server renvoie = le JS du form du slot mais sans layout (le contenu du partial form pour ce slot) => '_form.html.erb'
+          // on execute aussi le edit.js = l'instruction JS qui affiche ce form au bon endroit sur ta page => via 'edit.js'
+          success: function(data) {
+              console.log("ok");
+              console.log(data);
+              var annee = $('#shift_start_1i').val(); // contient année initiale de l'event
+              var mois = $('#shift_start_2i').val();
+              var jour = $('#shift_start_3i').val();
+              var start = $('#shift_start_4i').val();
+              var end = $('#shift_start_5i').val();
+              console.log(annee + mois + jour + start + end);
+                                  },
+          error: function(jqXHR) {
+            console.log(jqXHR.responseText);
+            console.log("nok");
+                                  }
+        });
+      },
+
+
+
+      // cas où on clique sur un évènement déjà existant dans le calendar
       eventClick: function(calEvent, jsEvent, view) {
-        // alert('Event: ' + calEvent.title);
+        $(this).css('border-color', 'red');//change the border color to red
 
-        // change the border color just for fun
-        // $(this).css('border-color', 'red');
+        // 1 Requête Ajax: shift/:id/edit
+        $.ajax({
+          type: "GET",
+          url: "/shifts/22/edit.js", // shift_editpath(@shift, format: : js)
+          // dataType : 'js', // Le type de données à recevoir
+          // url: "/shifts/<%= @id %>/edit",     => version projet pour avoir l'id du slot
+          // data = ce que le server renvoie = le JS du form du slot mais sans layout (le contenu du partial form pour ce slot) => '_form.html.erb'
+          // on execute aussi le edit.js = l'instruction JS qui affiche ce form au bon endroit sur ta page => via 'edit.js'
+          success: function(data) {
+              console.log("ok");
+              console.log(data);
+                                  },
+          error: function(jqXHR) {
+            console.log(jqXHR.responseText);
+            console.log("nok");
+                                  }
+
+        });
         }
     });
+
   </script>
 <% end %>
+
