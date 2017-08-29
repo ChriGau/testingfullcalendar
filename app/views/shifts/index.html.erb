@@ -1,3 +1,47 @@
 <div class="container">
   <div id = "calendar"></div>
 </div>
+
+
+<%= content_for(:after_js) do %>
+  <script>
+    $('#calendar').fullCalendar({
+      header: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'month,agendaWeek,agendaDay'
+      },
+      editable: true, // events on the calendar can be modified
+      droppable: true, // allows things to be dropped onto the calendar
+      events: '/shifts.json',
+
+        // 1. edit slot
+        // resizing: (on drop) get date
+        // on click: get number of people
+        // => update instances (date)
+
+        // 2. create slot (dropped from the outside)
+        // get date
+        // ask + get number of people for this slot (n)
+        // instance already exists? (not dropped from outside) => update instance of slot
+        // else create n instance of slot
+        // change class of object
+        // store ids of the slots in it?
+      drop: function(date, jsEvent, ui, resourceId) {
+        // is the "remove after drop" checkbox checked?
+        alert("Dropped on " + date.format());
+        console.log(date);
+        if ($('#drop-remove').is(':checked')) {
+          // if so, remove the element from the "Draggable Events" list
+          $(this).remove();
+        }
+      }
+      eventClick: function(calEvent, jsEvent, view) {
+        // alert('Event: ' + calEvent.title);
+
+        // change the border color just for fun
+        // $(this).css('border-color', 'red');
+        }
+    });
+  </script>
+<% end %>
